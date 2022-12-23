@@ -1,0 +1,46 @@
+version: Wh3"
+
+networks:
+  monitoring:
+
+services:
+  influxdb:
+    image: influxdb:2.5.1
+    hostname: influxdb
+    ports:
+      - ${INFLUXDB_PORT}:8086
+    networks:
+      - monitoring
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_USER}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=${INFLUXDB_ORG}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${INFLUXDB_BUCKET}
+
+  postgres:
+    image: postgres
+    restart: always
+    hostname: postgres
+    ports:
+      - ${POSTGRES_PORT}:5432
+    networks:
+      - monitoring
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  grafana:
+    image: grafana/grafana:8.4.5
+    hostname: grafana
+    ports:
+      - ${GRAFANA_PORT}:3000
+    networks:
+      - monitoring
+    env_file:
+      - .env
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+
+ 

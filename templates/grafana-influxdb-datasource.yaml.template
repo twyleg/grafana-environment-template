@@ -1,0 +1,27 @@
+apiVersion: 1
+
+datasources:
+  - name: influxdb-influxql
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    database: ${INFLUXDB_BUCKET}
+    jsonData:
+      httpMode: GET
+      httpHeaderName1: "Authorization"
+    secureJsonData:
+      httpHeaderValue1: "Token INFLUXDB_GRAFANA_TOKEN"
+  - name: influxdb-flux
+    type: "influxdb"
+    access: "proxy"
+    url: http://influxdb:8086
+    editable: true
+    secureJsonData:
+      token: "INFLUXDB_GRAFANA_TOKEN"
+    jsonData:
+      version: Flux
+      organization: ${INFLUXDB_ORG}
+      defaultBucket: ${INFLUXDB_BUCKET}
+      tlsSkipVerify: true
+      timeInterval: "1m"   
+  
