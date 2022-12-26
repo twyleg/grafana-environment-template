@@ -38,6 +38,16 @@ function add_postgres_datasource_to_grafana(){
   rm $SCRIPT_DIR/grafana-postgres-datasource.yaml
 }
 
+function write_influxdb_importer_login_details_to_json(){
+  jq -n \
+	  --arg INFLUXDB_PORT "${INFLUXDB_PORT}" \
+	  --arg INFLUXDB_ORG "${INFLUXDB_ORG}" \
+	  --arg INFLUXDB_BUCKET "${INFLUXDB_BUCKET}" \
+	  --arg INFLUXDB_TOKEN "${INFLUXDB_IMPORTER_TOKEN}" \
+	  '{influxdb_port: $INFLUXDB_PORT, influxdb_org: $INFLUXDB_ORG, influxdb_bucket: $INFLUXDB_BUCKET, influxdb_token: $INFLUXDB_TOKEN}' \
+  	  > influxdb_importer_login_details.json
+}
+
 source settings.env
 
 dc down
@@ -51,10 +61,7 @@ INFLUXDB_GRAFANA_TOKEN=$(generate_influxdb_api_token)
 add_influxdb_datasource_to_grafana $INFLUXDB_GRAFANA_TOKEN
 add_postgres_datasource_to_grafana
 
-export INFLUXDB_URL="http://localhost:${INFLUXDB_PORT}"
-export INFLUXDB_ORG="${INFLUXDB_ORG}"
-export INFLUXDB_BUCKET="${INFLUXDB_BUCKET}"
-export INFLUXDB_TOKEN=$INFLUXDB_IMPORTER_TOKEN
+write_influxdb_importer_login_details_to_json
 
 echo -e "Influxdb API tokens\n"
 echo -e "  Importer: \t$INFLUXDB_IMPORTER_TOKEN\n"
