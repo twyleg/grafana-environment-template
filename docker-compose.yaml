@@ -35,6 +35,21 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
+  postgrest:
+    image: postgrest/postgrest
+    ports:
+      - 3001:3000
+    networks:
+      - monitoring
+    environment:
+      PGRST_DB_URI: postgres://authenticator:1234567890@postgres:5432/postgres
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3001
+      PGRST_JWT_SECRET: "vhlKZINWpHSVROiFKh2TV09IEHSGSj10"
+      PGRST_JWT_SECRET_IS_BASE64: false
+      PGRST_DB_ANON_ROLE: postgres-user
+    depends_on:
+      - postgres
+
   grafana:
     image: grafana/grafana:8.4.5
     hostname: grafana
