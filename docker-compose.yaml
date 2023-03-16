@@ -58,7 +58,7 @@ services:
       - PGRST_OPENAPI_SERVER_PROXY_URI=http://127.0.0.1:3001
       - PGRST_JWT_SECRET=${POSTGREST_JWT}
       - PGRST_JWT_SECRET_IS_BASE64=false
-    depends_on:
+   depends_on:
       - postgres
 
   grafana:
