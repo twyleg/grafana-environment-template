@@ -4,7 +4,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 COMPOSE_FILE=$SCRIPT_DIR/docker-compose.yaml
 
 function dc(){
-  sudo docker compose --env-file=settings.env -f $COMPOSE_FILE $@
+  sudo docker compose --env-file=settings.env -f $COMPOSE_FILE "$@"
 }
 
 function generate_influxdb_api_token(){
@@ -48,6 +48,25 @@ function write_influxdb_importer_login_details_to_json(){
   	  > influxdb_importer_login_details.json
 }
 
+function init_postgres(){
+  dc exec -it postgres psql -U ${POSTGRES_USER} -c "create role authenticator noinherit login password '${POSTGRES_PASSWORD}';"
+  dc exec -it postgres psql -U ${POSTGRES_USER} -c "grant \"${POSTGRES_USER}\" to authenticator;"
+}
+
+function print_results(){
+  echo -e "\n\rPorts:"
+  echo -e "  Influxdb:  ${INFLUXDB_PORT}"
+  echo -e "  Postgres:  ${POSTGRES_PORT}"
+  echo -e "  PgAdmin:   ${PGADMIN_PORT}"
+  echo -e "  Postgrest: ${POSTGREST_PORT}"
+  echo -e "  Grafana:   ${GRAFANA_PORT}"
+  echo -e ""
+  echo -e "Influxdb API tokens"
+  echo -e "  Importer: $INFLUXDB_IMPORTER_TOKEN"
+  echo -e "  Grafana:  $INFLUXDB_GRAFANA_TOKEN"
+}
+
+
 source settings.env
 
 dc down
@@ -61,9 +80,8 @@ INFLUXDB_GRAFANA_TOKEN=$(generate_influxdb_api_token)
 add_influxdb_datasource_to_grafana $INFLUXDB_GRAFANA_TOKEN
 add_postgres_datasource_to_grafana
 
+init_postgres
+
 write_influxdb_importer_login_details_to_json
 
-echo -e "Influxdb API tokens\n"
-echo -e "  Importer: \t$INFLUXDB_IMPORTER_TOKEN\n"
-echo -e "  Grafana: \t$INFLUXDB_GRAFANA_TOKEN\n"
-
+print_results

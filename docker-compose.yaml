@@ -42,7 +42,7 @@ services:
     networks:
       - monitoring
     environment:
-      - PGADMIN_DEFAULT_EMAIL=user@domain.com
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}  
     depends_on:
       - postgres
@@ -57,8 +57,7 @@ services:
       - PGRST_DB_URI=postgres://authenticator:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_USER}
       - PGRST_OPENAPI_SERVER_PROXY_URI=http://127.0.0.1:3001
       - PGRST_JWT_SECRET=${POSTGREST_JWT}
-      - PGRST_JWT_SECRET_IS_BASE64=false
-   depends_on:
+    depends_on:
       - postgres
 
   grafana:
